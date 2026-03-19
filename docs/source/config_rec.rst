@@ -82,6 +82,7 @@ General
 - algorithm_sequence
 
 | Mandatory, defines sequence of algorithms applied in each iteration during modulus projection and during modulus. The "*" character means repeat, and the "+" means add to the sequence. The sequence may contain single brackets defining a group that will be repeated by the preceding multiplier. The alphabetic entries: ER, ERpc, HIO, HIOpc define algorithms used in this iteration. The entries will invoke functions as follows: ER definition will invoke 'er' and 'modulus' functions, the ERpc will invoke 'er' and 'pc_modulus', HIO will invoke 'hio' and 'modulus', and HIOpc will invoke 'hio' and 'pc_modulus', 'RAAR' will invoke 'raar' and 'modulus', 'SF' will invoke 'sf' and 'modulus'. The pc_modulus is implementation of modulus with partial coherence correction. In second example the sequence contains sub-triggers, explained in  :ref:`formula` page.
+| When slice_mode is True, use slice-mode algorithms: slER, slHIO, slSF, slRAAR. These apply the slice-by-slice modulus projection (per-frame 2D FFT with phase factors) followed by the corresponding support constraint.
 
 ::
 
@@ -407,5 +408,91 @@ GA
 | Defines which GA algorithm to use. If present and True, the number of reconstructions is limited to available resources. This reconstruction is very fast. Otherwise the number of reconstructions is unlimited but the performance is worse as the intermediate results must be stored.
 
 ::
+
+    ga_fast = True
+
+Slice-by-Slice Reconstruction
+++++++++++++++++++++++++++++++
+| Slice-by-slice mode enables 3D reconstruction from partial rocking curves (sparse subsets of frames). Instead of using 3D FFT, the reconstruction operates on individual 2D slices in reciprocal space, applying per-frame phase factors and 2D Fourier transforms. This allows reconstruction even when only a subset of rocking-curve frames are available. Slice-mode algorithms are: slER, slHIO, slSF, slRAAR.
+
+- slice_mode
+
+| Optional, defaults to False. When True, the reconstruction uses the slice-by-slice engine with per-frame 2D transforms instead of 3D FFT.
+
+::
+
+    slice_mode = True
+
+- scan_type
+
+| Optional, defaults to "rocking". Defines the type of scan geometry. Currently only "rocking" is supported.
+
+::
+
+    scan_type = "rocking"
+
+- slice_indices
+
+| Optional. When provided, defines which frame indices from the full rocking curve to use. This enables partial-scan reconstruction. If not provided, all frames are used.
+
+::
+
+    slice_indices = [0, 4, 8, 12, 16, 20, 24, 28, 31]
+
+- kf_direction
+
+| Required for slice_mode. The direction of the scattered beam wavevector, as a 3-element list [kx, ky, kz].
+
+::
+
+    kf_direction = [0.0, 0.0, 1.0]
+
+- ki_direction
+
+| Required for slice_mode. The direction of the incident beam wavevector, as a 3-element list [kx, ky, kz].
+
+::
+
+    ki_direction = [0.0, 0.0, 1.0]
+
+- bragg_peak
+
+| Required for slice_mode. The central Bragg peak position in reciprocal space, as a 3-element list [qx, qy, qz].
+
+::
+
+    bragg_peak = [0.0, 0.0, 1.0]
+
+- voxel_size
+
+| Required for slice_mode. The real-space voxel size in each dimension, as a 3-element list [dx, dy, dz] in meters.
+
+::
+
+    voxel_size = [10.0e-9, 10.0e-9, 10.0e-9]
+
+- wavelength
+
+| Required for slice_mode. The X-ray wavelength in meters.
+
+::
+
+    wavelength = 1.3776e-10
+
+- det_distance
+
+| Required for slice_mode. The sample-to-detector distance in meters.
+
+::
+
+    det_distance = 1.0
+
+- det_pixel
+
+| Required for slice_mode. The detector pixel size in meters.
+
+::
+
+    det_pixel = 55.0e-6
 
     ga_fast = True

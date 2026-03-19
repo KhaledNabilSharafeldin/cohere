@@ -1323,6 +1323,9 @@ def create_rec(params, datainfo, pkg, dev, **kwargs):
     rec_type = kwargs.pop('rec_type', 'basic')
     if rec_type == 'mp':
         worker = CoupledRec(params, datainfo, pkg, **kwargs)
+    elif params.get('slice_mode', False):
+        from cohere_core.controller.slice_rec import SliceRec
+        worker = SliceRec(params, datainfo, pkg, **kwargs)
     else:
         worker = Rec(params, datainfo, pkg, **kwargs)
 

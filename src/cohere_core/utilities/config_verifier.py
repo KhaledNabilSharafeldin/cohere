@@ -797,6 +797,38 @@ def ver_config_rec(config_map):
             print(error_message)
             return (error_message)
 
+    # Slice-by-slice reconstruction parameters
+    if 'slice_mode' in config_map:
+        if type(config_map['slice_mode']) != bool:
+            print('slice_mode parameter must be boolean (true/false)')
+            return 'slice_mode parameter must be boolean (true/false)'
+
+    if 'scan_type' in config_map:
+        if config_map['scan_type'] not in ('rocking', 'energy'):
+            print('scan_type must be "rocking" or "energy"')
+            return 'scan_type must be "rocking" or "energy"'
+
+    if 'slice_indices' in config_map:
+        if not ver_list_int('slice_indices', config_map['slice_indices']):
+            print('slice_indices must be a list of integers')
+            return 'slice_indices must be a list of integers'
+
+    for vec_param in ('kf_direction', 'ki_direction', 'bragg_peak', 'voxel_size'):
+        if vec_param in config_map:
+            val = config_map[vec_param]
+            if not ver_list_float(vec_param, val):
+                msg = f'{vec_param} must be a list of floats'
+                print(msg)
+                return msg
+
+    for float_param in ('wavelength', 'det_distance', 'det_pixel'):
+        if float_param in config_map:
+            val = config_map[float_param]
+            if type(val) != float and type(val) != int:
+                msg = f'{float_param} must be a number'
+                print(msg)
+                return msg
+
     # return empty string if verified
     return ("")
 
